@@ -85,7 +85,7 @@ public class ShutterBlock extends Block implements SimpleWaterloggedBlock {
     public final BlockSetType type;
 
     public ShutterBlock(BlockSetType type, Properties properties) {
-        super(properties);
+        super(properties.sound(type.soundType()));
         this.type = type;
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
@@ -221,13 +221,22 @@ public class ShutterBlock extends Block implements SimpleWaterloggedBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
         Direction clickedFace = context.getClickedFace();
-        AttachFace face = clickedFace == Direction.UP ? AttachFace.FLOOR : (clickedFace == Direction.DOWN ? AttachFace.CEILING : AttachFace.WALL);
+        BlockState state = this.defaultBlockState();
 
-        BlockState state = this.defaultBlockState()
-                .setValue(FACING, context.getHorizontalDirection().getOpposite())
-                .setValue(FACE, face)
-                .setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER)
-                .setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()));
+        if (clickedFace.getAxis().isHorizontal() && context.isSecondaryUseActive() && !context.replacingClickedOnBlock()) {
+            state = state.setValue(FACING, clickedFace)
+                    .setValue(FACE, context.getClickLocation().y - (double) context.getClickedPos().getY() > 0.5 ? AttachFace.CEILING : AttachFace.FLOOR);
+        } else {
+            AttachFace face = clickedFace == Direction.UP ? AttachFace.FLOOR : (clickedFace == Direction.DOWN ? AttachFace.CEILING : AttachFace.WALL);
+            state = state.setValue(FACING, context.getHorizontalDirection().getOpposite())
+                    .setValue(FACE, face);
+        }
+
+        if (context.getLevel().hasNeighborSignal(context.getClickedPos())) {
+            state = state.setValue(OPEN, true).setValue(POWERED, true);
+        }
+
+        state = state.setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
 
         return calculateBlockedState(state, context.getLevel(), context.getClickedPos());
     }

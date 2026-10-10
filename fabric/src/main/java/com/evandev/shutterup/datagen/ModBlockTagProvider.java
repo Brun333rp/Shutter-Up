@@ -1,6 +1,7 @@
 package com.evandev.shutterup.datagen;
 
 import com.evandev.shutterup.ModRegistry;
+import com.evandev.shutterup.ModTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
@@ -23,6 +24,9 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
         FabricTagBuilder incorrectGoldBuilder = getOrCreateTagBuilder(BlockTags.INCORRECT_FOR_GOLD_TOOL);
         FabricTagBuilder incorrectWoodenBuilder = getOrCreateTagBuilder(BlockTags.INCORRECT_FOR_WOODEN_TOOL);
 
+        FabricTagBuilder shuttersBuilder = getOrCreateTagBuilder(ModTags.Blocks.SHUTTERS).addTag(ModTags.Blocks.WOODEN_SHUTTERS);
+        FabricTagBuilder woodenShuttersBuilder = getOrCreateTagBuilder(ModTags.Blocks.WOODEN_SHUTTERS);
+
         ModRegistry.BLOCKS.forEach((name, blockSupplier) -> {
             if (name.contains("iron") || name.contains("copper")) {
                 pickaxeBuilder.add(blockSupplier.get());
@@ -30,9 +34,16 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 needsStoneToolBuilder.add(blockSupplier.get());
                 incorrectGoldBuilder.add(blockSupplier.get());
                 incorrectWoodenBuilder.add(blockSupplier.get());
+
+                shuttersBuilder.add(blockSupplier.get());
             } else {
                 axeBuilder.add(blockSupplier.get());
+
+                woodenShuttersBuilder.add(blockSupplier.get());
             }
         });
+
+        getOrCreateTagBuilder(ModTags.Blocks.SABLE_QUARTER_VOLUME).addTag(ModTags.Blocks.SHUTTERS);
+        getOrCreateTagBuilder(ModTags.Blocks.SABLE_SUPER_LIGHT).addTag(ModTags.Blocks.SHUTTERS);
     }
 }

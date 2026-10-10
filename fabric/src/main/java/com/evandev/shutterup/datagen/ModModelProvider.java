@@ -5,11 +5,10 @@ import com.evandev.shutterup.ModRegistry;
 import com.evandev.shutterup.block.ShutterBlock;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
-import net.minecraft.core.Direction;
 import net.minecraft.data.models.BlockModelGenerators;
 import net.minecraft.data.models.ItemModelGenerators;
-import net.minecraft.data.models.blockstates.Condition;
-import net.minecraft.data.models.blockstates.MultiPartGenerator;
+import net.minecraft.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.data.models.blockstates.PropertyDispatch;
 import net.minecraft.data.models.blockstates.Variant;
 import net.minecraft.data.models.blockstates.VariantProperties;
 import net.minecraft.data.models.model.ModelLocationUtils;
@@ -18,7 +17,6 @@ import net.minecraft.data.models.model.TextureMapping;
 import net.minecraft.data.models.model.TextureSlot;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.properties.AttachFace;
 
 import java.util.Optional;
 
@@ -75,89 +73,41 @@ public class ModModelProvider extends FabricModelProvider {
         ResourceLocation rightBlockedModel = rightBlockedTemplate.createWithSuffix(block, "_open_right_blocked", textureMapping, generator.modelOutput);
         ResourceLocation bothBlockedModel = bothBlockedTemplate.createWithSuffix(block, "_open_both_blocked", textureMapping, generator.modelOutput);
 
-        MultiPartGenerator multipart = MultiPartGenerator.multiPart(block);
+        generator.blockStateOutput.accept(MultiVariantGenerator.multiVariant(block).with(
+                PropertyDispatch.properties(ShutterBlock.FACE, ShutterBlock.FACING, ShutterBlock.OPEN, ShutterBlock.BLOCKED_LEFT, ShutterBlock.BLOCKED_RIGHT)
+                        .generate((face, dir, open, left, right) -> {
+                            VariantProperties.Rotation xRot = switch (face) {
+                                case FLOOR -> VariantProperties.Rotation.R270;
+                                case CEILING -> VariantProperties.Rotation.R90;
+                                default -> VariantProperties.Rotation.R0;
+                            };
 
-        for (AttachFace face : AttachFace.values()) {
-            VariantProperties.Rotation xRot = switch (face) {
-                case FLOOR -> VariantProperties.Rotation.R270;
-                case CEILING -> VariantProperties.Rotation.R90;
-                default -> VariantProperties.Rotation.R0;
-            };
+                            VariantProperties.Rotation yRot = switch (dir) {
+                                case EAST -> VariantProperties.Rotation.R90;
+                                case SOUTH -> VariantProperties.Rotation.R180;
+                                case WEST -> VariantProperties.Rotation.R270;
+                                default -> VariantProperties.Rotation.R0;
+                            };
 
-            for (Direction dir : Direction.Plane.HORIZONTAL) {
-                VariantProperties.Rotation yRot = switch (dir) {
-                    case EAST -> VariantProperties.Rotation.R90;
-                    case SOUTH -> VariantProperties.Rotation.R180;
-                    case WEST -> VariantProperties.Rotation.R270;
-                    default -> VariantProperties.Rotation.R0;
-                };
+                            ResourceLocation model;
+                            if (!open) {
+                                model = closedModel;
+                            } else if (left && right) {
+                                model = bothBlockedModel;
+                            } else if (left) {
+                                model = leftBlockedModel;
+                            } else if (right) {
+                                model = rightBlockedModel;
+                            } else {
+                                model = openModel;
+                            }
 
-                multipart.with(
-                        Condition.condition()
-                                .term(ShutterBlock.FACE, face)
-                                .term(ShutterBlock.FACING, dir)
-                                .term(ShutterBlock.OPEN, false),
-                        Variant.variant()
-                                .with(VariantProperties.MODEL, closedModel)
-                                .with(VariantProperties.X_ROT, xRot)
-                                .with(VariantProperties.Y_ROT, yRot)
-                );
-
-                multipart.with(
-                        Condition.condition()
-                                .term(ShutterBlock.FACE, face)
-                                .term(ShutterBlock.FACING, dir)
-                                .term(ShutterBlock.OPEN, true)
-                                .term(ShutterBlock.BLOCKED_LEFT, false)
-                                .term(ShutterBlock.BLOCKED_RIGHT, false),
-                        Variant.variant()
-                                .with(VariantProperties.MODEL, openModel)
-                                .with(VariantProperties.X_ROT, xRot)
-                                .with(VariantProperties.Y_ROT, yRot)
-                );
-
-                multipart.with(
-                        Condition.condition()
-                                .term(ShutterBlock.FACE, face)
-                                .term(ShutterBlock.FACING, dir)
-                                .term(ShutterBlock.OPEN, true)
-                                .term(ShutterBlock.BLOCKED_LEFT, true)
-                                .term(ShutterBlock.BLOCKED_RIGHT, false),
-                        Variant.variant()
-                                .with(VariantProperties.MODEL, leftBlockedModel)
-                                .with(VariantProperties.X_ROT, xRot)
-                                .with(VariantProperties.Y_ROT, yRot)
-                );
-
-                multipart.with(
-                        Condition.condition()
-                                .term(ShutterBlock.FACE, face)
-                                .term(ShutterBlock.FACING, dir)
-                                .term(ShutterBlock.OPEN, true)
-                                .term(ShutterBlock.BLOCKED_LEFT, false)
-                                .term(ShutterBlock.BLOCKED_RIGHT, true),
-                        Variant.variant()
-                                .with(VariantProperties.MODEL, rightBlockedModel)
-                                .with(VariantProperties.X_ROT, xRot)
-                                .with(VariantProperties.Y_ROT, yRot)
-                );
-
-                multipart.with(
-                        Condition.condition()
-                                .term(ShutterBlock.FACE, face)
-                                .term(ShutterBlock.FACING, dir)
-                                .term(ShutterBlock.OPEN, true)
-                                .term(ShutterBlock.BLOCKED_LEFT, true)
-                                .term(ShutterBlock.BLOCKED_RIGHT, true),
-                        Variant.variant()
-                                .with(VariantProperties.MODEL, bothBlockedModel)
-                                .with(VariantProperties.X_ROT, xRot)
-                                .with(VariantProperties.Y_ROT, yRot)
-                );
-            }
-        }
-
-        generator.blockStateOutput.accept(multipart);
+                            return Variant.variant()
+                                    .with(VariantProperties.MODEL, model)
+                                    .with(VariantProperties.X_ROT, xRot)
+                                    .with(VariantProperties.Y_ROT, yRot);
+                        })
+        ));
     }
 
     @Override

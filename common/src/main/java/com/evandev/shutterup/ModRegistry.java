@@ -18,19 +18,19 @@ public class ModRegistry {
     public static final Map<String, Supplier<Block>> BLOCKS = new LinkedHashMap<>();
     public static final Map<String, Supplier<Item>> ITEMS = new LinkedHashMap<>();
 
-    public static final Supplier<Block> ACACIA_SHUTTER = registerBlock("acacia_shutter", BlockSetType.ACACIA);
-    public static final Supplier<Block> BAMBOO_SHUTTER = registerBlock("bamboo_shutter", BlockSetType.BAMBOO);
-    public static final Supplier<Block> BIRCH_SHUTTER = registerBlock("birch_shutter", BlockSetType.BIRCH);
-    public static final Supplier<Block> CHERRY_SHUTTER = registerBlock("cherry_shutter", BlockSetType.CHERRY);
-    public static final Supplier<Block> CRIMSON_SHUTTER = registerBlock("crimson_shutter", BlockSetType.CRIMSON);
-    public static final Supplier<Block> DARK_OAK_SHUTTER = registerBlock("dark_oak_shutter", BlockSetType.DARK_OAK);
-    public static final Supplier<Block> JUNGLE_SHUTTER = registerBlock("jungle_shutter", BlockSetType.JUNGLE);
-    public static final Supplier<Block> MANGROVE_SHUTTER = registerBlock("mangrove_shutter", BlockSetType.MANGROVE);
-    public static final Supplier<Block> OAK_SHUTTER = registerBlock("oak_shutter", BlockSetType.OAK);
-    public static final Supplier<Block> SPRUCE_SHUTTER = registerBlock("spruce_shutter", BlockSetType.SPRUCE);
-    public static final Supplier<Block> WARPED_SHUTTER = registerBlock("warped_shutter", BlockSetType.WARPED);
+    public static final Supplier<Block> ACACIA_SHUTTER = registerBlock("acacia_shutter", BlockSetType.ACACIA, Blocks.ACACIA_TRAPDOOR);
+    public static final Supplier<Block> BAMBOO_SHUTTER = registerBlock("bamboo_shutter", BlockSetType.BAMBOO, Blocks.BAMBOO_TRAPDOOR);
+    public static final Supplier<Block> BIRCH_SHUTTER = registerBlock("birch_shutter", BlockSetType.BIRCH, Blocks.BIRCH_TRAPDOOR);
+    public static final Supplier<Block> CHERRY_SHUTTER = registerBlock("cherry_shutter", BlockSetType.CHERRY, Blocks.CHERRY_TRAPDOOR);
+    public static final Supplier<Block> CRIMSON_SHUTTER = registerBlock("crimson_shutter", BlockSetType.CRIMSON, Blocks.CRIMSON_TRAPDOOR);
+    public static final Supplier<Block> DARK_OAK_SHUTTER = registerBlock("dark_oak_shutter", BlockSetType.DARK_OAK, Blocks.DARK_OAK_TRAPDOOR);
+    public static final Supplier<Block> JUNGLE_SHUTTER = registerBlock("jungle_shutter", BlockSetType.JUNGLE, Blocks.JUNGLE_TRAPDOOR);
+    public static final Supplier<Block> MANGROVE_SHUTTER = registerBlock("mangrove_shutter", BlockSetType.MANGROVE, Blocks.MANGROVE_TRAPDOOR);
+    public static final Supplier<Block> OAK_SHUTTER = registerBlock("oak_shutter", BlockSetType.OAK, Blocks.OAK_TRAPDOOR);
+    public static final Supplier<Block> SPRUCE_SHUTTER = registerBlock("spruce_shutter", BlockSetType.SPRUCE, Blocks.SPRUCE_TRAPDOOR);
+    public static final Supplier<Block> WARPED_SHUTTER = registerBlock("warped_shutter", BlockSetType.WARPED, Blocks.WARPED_TRAPDOOR);
 
-    public static final Supplier<Block> IRON_SHUTTER = registerBlock("iron_shutter", BlockSetType.IRON);
+    public static final Supplier<Block> IRON_SHUTTER = registerBlock("iron_shutter", BlockSetType.IRON, Blocks.IRON_TRAPDOOR);
 
     public static final Supplier<Block> COPPER_SHUTTER = registerCopperBlock("copper_shutter", WeatheringCopper.WeatherState.UNAFFECTED, false);
     public static final Supplier<Block> EXPOSED_COPPER_SHUTTER = registerCopperBlock("exposed_copper_shutter", WeatheringCopper.WeatherState.EXPOSED, false);
@@ -74,14 +74,14 @@ public class ModRegistry {
         return blockSupplier;
     }
 
-    private static Supplier<Block> registerBlock(String name, BlockSetType type) {
+    private static Supplier<Block> registerBlock(String name, BlockSetType type, Block baseTrapdoor) {
         Supplier<Block> blockSupplier = new Supplier<>() {
             private Block instance;
 
             @Override
             public Block get() {
                 if (instance == null) {
-                    instance = new ShutterBlock(type, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_TRAPDOOR).noOcclusion());
+                    instance = new ShutterBlock(type, BlockBehaviour.Properties.ofFullCopy(baseTrapdoor).noOcclusion());
                 }
                 return instance;
             }

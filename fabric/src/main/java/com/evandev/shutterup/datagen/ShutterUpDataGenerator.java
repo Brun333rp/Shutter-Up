@@ -12,6 +12,7 @@ public class ShutterUpDataGenerator implements DataGeneratorEntrypoint {
         pack.addProvider(ModLangProvider::new);
         pack.addProvider(ModRecipeProvider::new);
         pack.addProvider(ModLootTableProvider::new);
-        pack.addProvider(ModBlockTagProvider::new);
+        ModBlockTagProvider blockTagProvider = pack.addProvider(ModBlockTagProvider::new);
+        pack.addProvider((output, registriesFuture) -> new ModItemTagProvider(output, registriesFuture, blockTagProvider));
     }
 }

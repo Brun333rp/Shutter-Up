@@ -24,6 +24,9 @@ public class CommonClass {
     public static InteractionResult onRightClickBlock(Player player, Level level, InteractionHand hand, BlockHitResult hitResult) {
         if (player.isSpectator()) return InteractionResult.PASS;
 
+        boolean holdingItem = !player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty();
+        if (player.isSecondaryUseActive() && holdingItem) return InteractionResult.PASS;
+
         BlockPos clickedPos = hitResult.getBlockPos();
         Direction clickedFace = hitResult.getDirection();
         BlockState clickedState = level.getBlockState(clickedPos);
@@ -39,7 +42,9 @@ public class CommonClass {
             }
         }
 
-        if (!clickedState.isSolidRender(level, clickedPos)) {
+        boolean isInteractive = level.getBlockEntity(clickedPos) != null || clickedState.getMenuProvider(level, clickedPos) != null;
+
+        if (!clickedState.isSolidRender(level, clickedPos) && !isInteractive) {
             BlockPos behindPos = clickedPos.relative(clickedFace.getOpposite());
             BlockState behindState = level.getBlockState(behindPos);
 
