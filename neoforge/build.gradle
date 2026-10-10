@@ -1,7 +1,7 @@
 plugins {
     id 'multiloader-loader'
     id 'net.neoforged.moddev'
-    id "me.modmuss50.mod-publish-plugin" version "1.1.0"
+    id "me.modmuss50.mod-publish-plugin" version "2.1.0"
 }
 
 repositories {
@@ -73,6 +73,8 @@ publishMods {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         projectId = "1420451"
         minecraftVersions.add("${minecraft_version}")
+        client = true
+        server = true
 
         optional { slug = "every-compat" }
         optional { slug = "vanillabackport" }
