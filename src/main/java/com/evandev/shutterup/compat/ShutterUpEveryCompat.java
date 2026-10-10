@@ -1,0 +1,45 @@
+package com.evandev.shutterup.compat;
+
+import com.evandev.shutterup.Constants;
+import com.evandev.shutterup.ModRegistry;
+import com.evandev.shutterup.ModTags;
+import com.evandev.shutterup.block.ShutterBlock;
+import net.mehvahdjukaar.every_compat.api.SimpleEntrySet;
+import net.mehvahdjukaar.every_compat.api.SimpleModule;
+import net.mehvahdjukaar.moonlight.api.set.wood.VanillaWoodTypes;
+import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
+import net.mehvahdjukaar.moonlight.api.util.Utils;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.Block;
+
+public class ShutterUpEveryCompat extends SimpleModule {
+
+    public final SimpleEntrySet<WoodType, Block> shutters;
+
+    public ShutterUpEveryCompat() {
+        super(Constants.MOD_ID, "shutterup", Constants.MOD_ID);
+
+        shutters = SimpleEntrySet.builder(WoodType.class, "shutter",
+                        ModRegistry.OAK_SHUTTER,
+                        () -> VanillaWoodTypes.OAK,
+                        w -> new ShutterBlock(
+                                w.toVanillaOrOak().setType(),
+                                Utils.copyPropertySafe(w.planks).noOcclusion()
+                        )
+                )
+                .addTextureC(modRes("block/everycompat_shutter"), "block/oak_shutter")
+                .addTextureC(modRes("item/everycompat_shutter"), "item/oak_shutter")
+
+                .addTag(ModTags.Blocks.WOODEN_SHUTTERS, Registries.BLOCK)
+                .addTag(ModTags.Items.WOODEN_SHUTTERS, Registries.ITEM)
+                .addTag(BlockTags.MINEABLE_WITH_AXE, Registries.BLOCK)
+
+                .setTabKey(ResourceKey.create(Registries.CREATIVE_MODE_TAB, Constants.location("minecraft", "building_blocks")))
+                .defaultRecipe()
+                .build();
+
+        this.addEntry(shutters);
+    }
+}
