@@ -21,6 +21,6 @@
   "block.shutterup.weathered_copper_shutter": "Postigo de Cobre Desgastado",
   "block_type.shutterup.shutter": "Postigo de %s",
   "itemGroup.shutterup": "Shutter Up",
-  "subtitles.block.generic.close": "Postigo abre",
-  "subtitles.block.generic.open": "Postigo fecha"
+  "subtitles.block.generic.close": "Postigo fecha",
+  "subtitles.block.generic.open": "Postigo abre"
 }
